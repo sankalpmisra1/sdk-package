@@ -3,7 +3,7 @@ name: Publish Package
 on:
   pull_request:
     branches:
-      - main  
+      - main
 
 jobs:
   publish:
@@ -15,46 +15,43 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://npm.pkg.github.com'
-          cache: 'npm'
-          scope: '@sankalpmisra1'
+          node-version: '20' 
+          registry-url: 'https://npm.pkg.github.com' 
+          cache: 'npm'  
+          scope: '@sankalpmisra1' 
 
-      - uses: actions/cache@v4  
+      - uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
+          path: ~/.npm  
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }} 
+          restore-keys: | 
             ${{ runner.os }}-npm-
 
-      - name: Install dependencies
-        run: npm install --frozen-lockfile
+      - name: Install dependencies (using package-lock.json)
+        run: npm ci 
 
-      - name: Build package
-        run: npm run build
+      - name: Build package (if applicable)
+        run: npm run build  
 
       - name: Get package version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT  
 
       - name: Publish to GitHub Packages
-        uses: actions/checkout@v4  
-        with:
-          persist-credentials: true
-        run: npm publish
+        run: npm publish 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Release (optional)
         uses: actions/create-release@v1
-        if: success() && !github.event.pull_request
+        if: success() && !github.event.pull_request  
         env:
-          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.NPM_TOKEN }}  
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}
-          release_name: Release v${{ steps.get_version.outputs.version }}
-          body: |
+          tag_name: v${{ steps.get_version.outputs.version }} 
+          release_name: Release v${{ steps.get_version.outputs.version }}  
+          body: | 
             Release of version ${{ steps.get_version.outputs.version }}
 
             For full details, see the [changelog](./CHANGELOG.md) (if applicable).
-          draft: false
-          prerelease: false
+          draft: false  
+          prerelease: false  
